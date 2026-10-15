@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LSC Tracker">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f766e'/%3E%3Cpath d='M18 33l9 9 19-21' fill='none' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>LSC Int'l Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow column built for a thumb. Tabs scroll sideways, each counter is a row with big +/- buttons. */
+:root{
+  --bg:#f1f4f3; --panel:#ffffff; --fg:#13201b; --muted:#566660; --line:#d9e1dd;
+  --accent:#0f766e; --accent-soft:#d5ede8; --track:#e3e9e6; --on-accent:#ffffff;
+  --font-display:'Bricolage Grotesque','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --font-body:'Instrument Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1412; --panel:#151f1b; --fg:#e5eee9; --muted:#8fa299; --line:#25332d;
+  --accent:#3fc7b6; --accent-soft:#16332e; --track:#22302b; --on-accent:#08201c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1412; --panel:#151f1b; --fg:#e5eee9; --muted:#8fa299; --line:#25332d;
+  --accent:#3fc7b6; --accent-soft:#16332e; --track:#22302b; --on-accent:#08201c; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.4;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:640px;margin-inline:auto}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--font-display);font-weight:700;font-size:28px;letter-spacing:-.01em;margin:0}
+.sync{font-size:13px;color:var(--muted)}
+.take{margin:6px 0 16px;color:var(--muted)}
+.take b{color:var(--fg);font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;font:inherit;font-weight:500;font-size:15px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;padding:9px 16px;min-height:44px;cursor:pointer}
+.tab[aria-selected=true]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.tab:focus-visible,.btn:focus-visible,.reset:focus-visible,.stat:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grp{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px 6px;margin-bottom:14px}
+.grp>header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+h2{font-family:var(--font-display);font-weight:500;font-size:17px;margin:0}
+.reset{font:inherit;font-size:13px;color:var(--muted);background:none;border:0;padding:10px 0 10px 10px;min-height:44px;cursor:pointer}
+.reset.arm{color:var(--accent);font-weight:600}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.lbl{font-weight:500}
+.hint{font-size:13px;color:var(--muted)}
+.ctl{display:flex;align-items:center;gap:6px}
+.btn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.btn.plus{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:active{transform:scale(.96)}
+.num{min-width:68px;text-align:center;font-variant-numeric:tabular-nums}
+.num b{font-family:var(--font-display);font-size:24px;font-weight:700}
+.num span{color:var(--muted);font-size:14px}
+.hit .num b{color:var(--accent)}
+.bar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--track);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .2s}
+.stat{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;border-top:1px solid var(--line);padding:14px 0;min-height:56px;cursor:pointer}
+.stat:first-of-type{border-top:0}
+.chip{flex:none;font-size:13px;font-weight:600;border-radius:999px;padding:6px 12px;background:var(--track);color:var(--muted)}
+.chip.s1{background:var(--accent-soft);color:var(--accent)}
+.chip.s2{background:var(--accent);color:var(--on-accent)}
+.note{font-size:13px;color:var(--muted);margin:2px 0 12px}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}.btn:active{transform:none}}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+</style></head><body>
+
+<div class="wrap">
+  <div class="top"><h1>LSC Int'l</h1><div class="sync" id="sync" aria-live="polite"></div></div>
+  <p class="take" id="take"></p>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <main id="app"></main>
+</div>
+<script>
+const RANKS=[
+  {slug:'bronze-foundation',key:'bf',name:'Bronze Foundation',when:'By/before Oct 2026'},
+  {slug:'bronze-builder',key:'bb',name:'Bronze Builder',when:'Nov 2026'},
+  {slug:'arrow',key:'ar',name:'Arrow',when:'Jan 2027'}
+];
+const ROAD=RANKS.map((r)=>({id:r.key,name:r.name,when:r.when})).concat([{id:'fed',name:"Amway Platinum's FED, Jacksonville, FL",when:'Mar 2027'}]);
+const STATUS=['Not started','In progress','Achieved'];
+const PACE=[
+  {title:'Today',reset:'Reset today',items:[
+    {id:'conversations',label:'Conversations',target:3},
+    {id:'bridge_names',label:'Names for Bridge text meeting',target:7,hint:'Meeting with Evans'}]},
+  {title:'This week',reset:'Reset week',items:[
+    {id:'step3',label:'Step 3',target:5},
+    {id:'connections',label:'New connections',target:12},
+    {id:'pcms',label:'PCMs',target:4,hint:'Feeds BRE clients'}]},
+  {title:'This month',reset:'Reset month',items:[
+    {id:'pv300',label:'300pv circle',target:1,hint:'Due by the 15th of every month'},
+    {id:'bre',label:'BRE clients',target:10}]},
+  {title:'Customer list',reset:null,items:[
+    {id:'customer_names',label:'Names added',target:25}]}
+];
+function rankGroups(r){
+  const k=r.key+'_';
+  return [
+    {title:'Monthly',reset:'Reset month',items:[{id:k+'pv300',label:'300pv circle',target:1,hint:'By the 15th of every month'}]},
+    {title:'Weekly',reset:'Reset week',items:[{id:k+'step3',label:'Step 3',target:5},{id:k+'connections',label:'New connections',target:12}]},
+    {title:'Each Bridge text meeting',reset:'New meeting',items:[{id:k+'names',label:'New names',target:7}]}
+  ];
+}
+const TABS=[{id:'pace',name:'Pace'}].concat(RANKS.map((r)=>({id:r.slug,name:r.name,rank:r})),[{id:'road',name:'Road'}]);
+const LS='lsc-tracker-v1';
+let state={counts:{},status:{}};
+try{const s=JSON.parse(localStorage.getItem(LS)||'null');if(s&&s.counts)state={counts:s.counts||{},status:s.status||{}};}catch(e){}
+let tab=TABS.some((t)=>t.id===location.hash.slice(1))?location.hash.slice(1):'pace';
+let rev=0,dirty=false,saving=false,again=false,timer=null,ref=null,armed=null,armTimer=null;
+const $app=document.getElementById('app'),$tabs=document.getElementById('tabs'),$take=document.getElementById('take'),$sync=document.getElementById('sync');
+const cnt=(id)=>Number(state.counts[id])||0;
+let groups=[];
+function allGroups(t){return t.id==='pace'?PACE:t.rank?rankGroups(t.rank):[];}
+function itemHtml(it){
+  const n=cnt(it.id),hit=n>=it.target,pct=Math.min(100,Math.round(n/it.target*100));
+  return '<div class="row'+(hit?' hit':'')+'"><div><div class="lbl">'+it.label+'</div>'+(it.hint?'<div class="hint">'+it.hint+'</div>':'')+'</div>'+
+    '<div class="ctl"><button class="btn" data-act="dec" data-id="'+it.id+'" aria-label="Subtract one from '+it.label+'">−</button>'+
+    '<div class="num"><b>'+n+'</b><span> / '+it.target+'</span></div>'+
+    '<button class="btn plus" data-act="inc" data-id="'+it.id+'" aria-label="Add one to '+it.label+'">+</button></div>'+
+    '<div class="bar"><i style="width:'+pct+'%"></i></div></div>';
+}
+function render(){
+  $tabs.innerHTML=TABS.map((t)=>'<button class="tab" role="tab" data-act="tab" data-id="'+t.id+'" aria-selected="'+(t.id===tab)+'">'+t.name+'</button>').join('');
+  const t=TABS.find((x)=>x.id===tab);
+  let html='';
+  groups=[];
+  if(t.id==='road'){
+    html='<div class="grp"><header><h2>Road to Platinum</h2></header><p class="note">Tap a step to change its status.</p>'+
+      ROAD.map((r)=>{const s=Number(state.status[r.id])||0;return '<button class="stat" data-act="status" data-id="'+r.id+'"><span><span class="lbl">'+r.name+'</span><br><span class="hint">'+r.when+'</span></span><span class="chip s'+s+'">'+STATUS[s]+'</span></button>';}).join('')+'</div>';
+  }else{
+    if(t.rank)html+='<p class="note">Target date: '+t.rank.when+'</p>';
+    allGroups(t).forEach((g,i)=>{
+      groups.push(g);
+      html+='<section class="grp"><header><h2>'+g.title+'</h2>'+(g.reset?'<button class="reset'+(armed===t.id+i?' arm':'')+'" data-act="reset" data-g="'+i+'">'+(armed===t.id+i?'Tap again to reset':g.reset)+'</button>':'')+'</header>'+g.items.map(itemHtml).join('')+'</section>';
+    });
+  }
+  $app.innerHTML=html;
+  let hit=0,total=0;
+  PACE.forEach((g)=>g.items.forEach((it)=>{total++;if(cnt(it.id)>=it.target)hit++;}));
+  $take.innerHTML='<b>'+hit+'</b> of <b>'+total+'</b> daily, weekly and monthly targets hit';
+}
+function setSync(s){$sync.textContent=s;}
+function touch(){
+  rev++;dirty=true;setSync(ref?'Saving…':'Saved on this device');
+  try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}
+  clearTimeout(timer);timer=setTimeout(save,500);
+}
+async function save(){
+  if(!ref){dirty=false;return;}
+  if(saving){again=true;return;}
+  saving=true;
+  do{
+    again=false;const r=rev;
+    try{await ref.set({counts:state.counts,status:state.status});if(r===rev){dirty=false;setSync('Saved');}}
+    catch(e){setSync('Saved on this device only');}
+  }while(again);
+  saving=false;
+}
+$tabs.addEventListener('click',(e)=>{const b=e.target.closest('[data-act=tab]');if(!b)return;tab=b.dataset.id;armed=null;render();});
+$app.addEventListener('click',(e)=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const a=b.dataset.act,id=b.dataset.id;
+  if(a==='inc'||a==='dec'){state.counts[id]=Math.max(0,cnt(id)+(a==='inc'?1:-1));touch();render();}
+  else if(a==='status'){state.status[id]=((Number(state.status[id])||0)+1)%STATUS.length;touch();render();}
+  else if(a==='reset'){
+    const key=tab+b.dataset.g;
+    if(armed!==key){armed=key;clearTimeout(armTimer);armTimer=setTimeout(()=>{armed=null;render();},3000);render();return;}
+    clearTimeout(armTimer);armed=null;
+    groups[Number(b.dataset.g)].items.forEach((it)=>{state.counts[it.id]=0;});
+    touch();render();
+  }
+});
+render();
+setSync('Saved on this device');
+</script>
+</body></html>
