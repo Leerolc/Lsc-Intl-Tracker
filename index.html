@@ -11,32 +11,34 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: one narrow column built for a thumb. Tabs scroll sideways, each counter is a row with big +/- buttons. */
+/* Layout: one narrow column built for a thumb. Tabs scroll sideways; counters and contacts are large tap rows. */
 :root{
   --bg:#f1f4f3; --panel:#ffffff; --fg:#13201b; --muted:#566660; --line:#d9e1dd;
-  --accent:#0f766e; --accent-soft:#d5ede8; --track:#e3e9e6; --on-accent:#ffffff;
+  --accent:#0f766e; --accent-soft:#d5ede8; --track:#e3e9e6; --on-accent:#ffffff; --warn:#9a5b00; --warn-soft:#fbeccb;
   --font-display:'Bricolage Grotesque','Avenir Next','Segoe UI',system-ui,sans-serif;
   --font-body:'Instrument Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0d1412; --panel:#151f1b; --fg:#e5eee9; --muted:#8fa299; --line:#25332d;
-  --accent:#3fc7b6; --accent-soft:#16332e; --track:#22302b; --on-accent:#08201c; color-scheme:dark}}
+  --accent:#3fc7b6; --accent-soft:#16332e; --track:#22302b; --on-accent:#08201c; --warn:#f0b955; --warn-soft:#3a2d12; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0d1412; --panel:#151f1b; --fg:#e5eee9; --muted:#8fa299; --line:#25332d;
-  --accent:#3fc7b6; --accent-soft:#16332e; --track:#22302b; --on-accent:#08201c; color-scheme:dark}
-body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.4;
-  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  --accent:#3fc7b6; --accent-soft:#16332e; --track:#22302b; --on-accent:#08201c; --warn:#f0b955; --warn-soft:#3a2d12; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.4;
+  padding-block:20px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:640px;margin-inline:auto}
 .top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
 h1{font-family:var(--font-display);font-weight:700;font-size:28px;letter-spacing:-.01em;margin:0}
-.sync{font-size:13px;color:var(--muted)}
+.sync{font:inherit;font-size:13px;color:var(--muted);background:none;border:0;padding:10px 0;min-height:44px;cursor:pointer;text-align:right}
 .take{margin:6px 0 16px;color:var(--muted)}
 .take b{color:var(--fg);font-variant-numeric:tabular-nums}
 .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:none;font:inherit;font-weight:500;font-size:15px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;padding:9px 16px;min-height:44px;cursor:pointer}
 .tab[aria-selected=true]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-.tab:focus-visible,.btn:focus-visible,.reset:focus-visible,.stat:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .grp{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px 6px;margin-bottom:14px}
 .grp>header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
 h2{font-family:var(--font-display);font-weight:500;font-size:17px;margin:0}
@@ -58,21 +60,68 @@ h2{font-family:var(--font-display);font-weight:500;font-size:17px;margin:0}
 .stat{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;border-top:1px solid var(--line);padding:14px 0;min-height:56px;cursor:pointer}
 .stat:first-of-type{border-top:0}
 .chip{flex:none;font-size:13px;font-weight:600;border-radius:999px;padding:6px 12px;background:var(--track);color:var(--muted)}
-.chip.s1{background:var(--accent-soft);color:var(--accent)}
+.chip.s1,.chip.on{background:var(--accent-soft);color:var(--accent)}
 .chip.s2{background:var(--accent);color:var(--on-accent)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
 .note{font-size:13px;color:var(--muted);margin:2px 0 12px}
+/* outreach */
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.tile .n{font-family:var(--font-display);font-weight:700;font-size:24px;font-variant-numeric:tabular-nums}
+.tile .n small{font-size:14px;color:var(--muted);font-weight:500}
+.tile .t{font-size:12px;color:var(--muted)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.fchip{flex:none;font:inherit;font-size:14px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 14px;min-height:40px;cursor:pointer}
+.fchip[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+input,select,textarea{font:inherit;font-size:16px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+textarea{min-height:76px;resize:vertical}
+.search{margin-bottom:12px}
+.item{border-top:1px solid var(--line)}
+.ihead{display:flex;align-items:center;gap:8px}
+.irow{flex:1;min-width:0;display:block;text-align:left;font:inherit;color:inherit;background:none;border:0;padding:10px 0;min-height:56px;cursor:pointer}
+.iname{display:block;font-weight:500;overflow-wrap:anywhere}
+.isub{display:block;font-size:13px;color:var(--muted)}
+.qt{display:flex;gap:6px;flex:none}
+.qt button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-weight:600;cursor:pointer}
+.panel{display:grid;gap:12px;padding:2px 0 16px}
+.f{display:grid;gap:4px}
+.f>label{font-size:13px;color:var(--muted)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.checks{display:flex;gap:18px;flex-wrap:wrap}
+.checks label{display:flex;align-items:center;gap:8px;min-height:44px}
+.checks input{width:22px;height:22px;min-height:0;padding:0}
+.primary{font:inherit;font-weight:600;background:var(--accent);color:var(--on-accent);border:0;border-radius:12px;min-height:48px;padding:0 18px;cursor:pointer}
+.ghost{font:inherit;font-weight:500;background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:12px;min-height:44px;padding:0 14px;cursor:pointer}
+.ghost[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.links,.tagrow{display:flex;gap:8px;flex-wrap:wrap}
+.links a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:12px;color:var(--accent);text-decoration:none;font-weight:500}
+.bubble{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.bubble .msg{flex:1;min-width:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.bubble button{flex:none}
+details{border:1px solid var(--line);border-radius:12px;padding:0 12px;background:var(--bg)}
+summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:500}
+details .body{padding:0 0 12px;overflow-wrap:anywhere;white-space:pre-wrap;font-size:15px}
+.more{width:100%;margin:12px 0}
+.empty{padding:18px 0;color:var(--muted)}
+.ref{border-top:1px solid var(--line);padding:12px 0;display:grid;gap:8px}
+.ref h3{margin:0;font-family:var(--font-display);font-weight:500;font-size:16px}
+.ref .who{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.ref p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);border-radius:12px;padding:12px 16px;max-width:calc(100% - 32px);z-index:5}
+.err{color:var(--warn);background:var(--warn-soft);border-radius:10px;padding:10px 12px;margin:0 0 12px}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}.btn:active{transform:none}}
-:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-body{margin:0}
 </style></head><body>
-
 <div class="wrap">
-  <div class="top"><h1>LSC Int'l</h1><div class="sync" id="sync" aria-live="polite"></div></div>
+  <div class="top"><h1>LSC Int'l</h1><button class="sync" id="sync" aria-live="polite" type="button"></button></div>
   <p class="take" id="take"></p>
   <div class="tabs" id="tabs" role="tablist"></div>
   <main id="app"></main>
 </div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <script>
+'use strict';
+/* ---------- constants ---------- */
 const RANKS=[
   {slug:'bronze-foundation',key:'bf',name:'Bronze Foundation',when:'By/before Oct 2026'},
   {slug:'bronze-builder',key:'bb',name:'Bronze Builder',when:'Nov 2026'},
@@ -102,76 +151,380 @@ function rankGroups(r){
     {title:'Each Bridge text meeting',reset:'New meeting',items:[{id:k+'names',label:'New names',target:7}]}
   ];
 }
-const TABS=[{id:'pace',name:'Pace'}].concat(RANKS.map((r)=>({id:r.slug,name:r.name,rank:r})),[{id:'road',name:'Road'}]);
-const LS='lsc-tracker-v1';
-let state={counts:{},status:{}};
-try{const s=JSON.parse(localStorage.getItem(LS)||'null');if(s&&s.counts)state={counts:s.counts||{},status:s.status||{}};}catch(e){}
-let tab=TABS.some((t)=>t.id===location.hash.slice(1))?location.hash.slice(1):'pace';
-let rev=0,dirty=false,saving=false,again=false,timer=null,ref=null,armed=null,armTimer=null;
-const $app=document.getElementById('app'),$tabs=document.getElementById('tabs'),$take=document.getElementById('take'),$sync=document.getElementById('sync');
+const TABS=[{id:'pace',name:'Pace'},{id:'outreach',name:'Outreach'},{id:'playbook',name:'Playbook'}]
+  .concat(RANKS.map((r)=>({id:r.slug,name:r.name,rank:r})),[{id:'road',name:'Road'},{id:'sync',name:'Sync'}]);
+const KEYS=['id','name','org','phone','email','loc','age','cat','flag','job','last','status','tag','fu'];
+const PLATFORMS=['Text','Instagram','Facebook','LinkedIn','WhatsApp','Call','Email'];
+const STEPS=['Connecting question','Situation','Problem awareness','Solution awareness','Commitment / PCM invite','Follow-up'];
+const OUTCOMES=['','Booked call','Became customer','Became partner','Not interested'];
+const FILTERS=[['due','Follow-ups due'],['batch','Day 1 batch'],['cust','Customers'],['part','Partners'],['untagged','Untagged'],['all','Everyone']];
+const LS_STATE='lsc-tracker-v1',LS_CFG='lsc-sync-v1',LS_DATA='lsc-data-v1',LS_Q='lsc-queue-v1',LS_DIRTY='lsc-dirty-v1';
+
+/* ---------- storage ---------- */
+function load(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v;}catch(e){return d;}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+const esc=(s)=>String(s==null?'':s).replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let state=load(LS_STATE,{counts:{},status:{}});
+if(!state.counts)state.counts={};
+if(!state.status)state.status={};
+let cfg=load(LS_CFG,null);
+let data=load(LS_DATA,null);
+let queue=load(LS_Q,[]);
+let dirty=!!load(LS_DIRTY,false);
+let contacts=[],byId=new Map(),batchInfo=new Map();
+let tab='pace',armed=null,armTimer=null,syncMsg='',lastErr='',busy=false,again=false,timer=null,renderLater=false;
+const ui={filter:'due',q:'',open:null,limit:40,form:{}};
+const $app=document.getElementById('app'),$tabs=document.getElementById('tabs'),$take=document.getElementById('take'),$sync=document.getElementById('sync'),$toast=document.getElementById('toast');
 const cnt=(id)=>Number(state.counts[id])||0;
-let groups=[];
-function allGroups(t){return t.id==='pace'?PACE:t.rank?rankGroups(t.rank):[];}
+
+/* ---------- dates ---------- */
+const pad=(n)=>String(n).padStart(2,'0');
+function localToday(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+const today=()=>(data&&data.today)||localToday();
+function addDays(s,n){const p=s.split('-').map(Number);const d=new Date(Date.UTC(p[0],p[1]-1,p[2]+n));return d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1)+'-'+pad(d.getUTCDate());}
+function timeNow(){const d=new Date();let h=d.getHours();const m=pad(d.getMinutes());const ap=h>=12?'PM':'AM';h=h%12||12;return h+':'+m+' '+ap;}
+
+/* ---------- sheet data ---------- */
+function buildData(){
+  const keys=(data&&data.keys)||KEYS;
+  contacts=((data&&data.rows)||[]).map((r)=>{const o={};keys.forEach((k,i)=>{o[k]=r[i]==null?'':String(r[i]);});return o;});
+  byId=new Map(contacts.map((c)=>[c.id,c]));
+  batchInfo=new Map();
+  const b=(data&&data.batch)||[];
+  if(b.length>1){
+    const h=b[0].map((x)=>String(x).toLowerCase());
+    const ix=(p)=>h.findIndex((x)=>x.indexOf(p)===0);
+    const c={id:ix('contact id'),type:ix('type'),ch:ix('channel'),found:ix('what i found'),draft:ix('message 1'),sent:ix('sent?')};
+    b.slice(1).forEach((r,n)=>{
+      const id=String(r[c.id]||'').trim();
+      if(id)batchInfo.set(id,{n,type:r[c.type]||'',channel:r[c.ch]||'',found:r[c.found]||'',draft:r[c.draft]||'',sent:r[c.sent]||''});
+    });
+  }
+}
+buildData();
+const settings=()=>(data&&data.settings)||{custTarget:10,partTarget:10,gap:2};
+function pendingSent(){
+  const p={Customer:0,Partner:0};
+  queue.forEach((q)=>{if(q.action==='act'&&q.sent){const c=byId.get(q.id);if(c&&p[c.cat]!==undefined)p[c.cat]++;}});
+  return p;
+}
+function visible(c){return !c.flag;}
+function list(){
+  const t=today(),q=ui.q.trim().toLowerCase();
+  let rows;
+  if(q){
+    const digits=q.replace(/\D/g,'');
+    rows=contacts.filter((c)=>(c.name+' '+c.org+' '+c.loc+' '+c.job).toLowerCase().indexOf(q)>=0||(digits.length>=3&&c.phone.replace(/\D/g,'').indexOf(digits)>=0));
+  }else if(ui.filter==='due'){
+    rows=contacts.filter((c)=>visible(c)&&c.fu&&c.fu<=t).sort((a,b)=>a.fu<b.fu?-1:a.fu>b.fu?1:0);
+  }else if(ui.filter==='batch'){
+    rows=contacts.filter((c)=>batchInfo.has(c.id)).sort((a,b)=>batchInfo.get(a.id).n-batchInfo.get(b.id).n);
+  }else if(ui.filter==='cust'){rows=contacts.filter((c)=>visible(c)&&c.cat==='Customer');}
+  else if(ui.filter==='part'){rows=contacts.filter((c)=>visible(c)&&c.cat==='Partner');}
+  else if(ui.filter==='untagged'){rows=contacts.filter((c)=>visible(c)&&!c.tag&&c.cat==='Unverified');}
+  else{rows=contacts.slice();}
+  if(!q&&!['due','batch'].includes(ui.filter))rows.sort((a,b)=>a.name.localeCompare(b.name));
+  return rows;
+}
+
+/* ---------- sync ---------- */
+function setSync(m){syncMsg=m;$sync.textContent=m;}
+function refreshSyncLabel(){
+  if(!cfg){setSync('Saved on this phone');return;}
+  const n=queue.length+(dirty?1:0);
+  if(busy)setSync('Syncing…');
+  else if(lastErr)setSync('Sync problem. Tap for details');
+  else if(n)setSync(n+' waiting to sync');
+  else setSync(data&&data.at?'Synced '+data.at:'Connected');
+}
+async function call(req){
+  const r=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({token:cfg.token},req))});
+  if(!r.ok)throw new Error('The sheet answered with an error ('+r.status+').');
+  let j;
+  try{j=await r.json();}catch(e){throw new Error('That link did not answer like the tracker script. Check that it is deployed with access set to Anyone.');}
+  if(!j.ok)throw new Error(j.error==='unauthorized'?'The secret code does not match the one in the script.':(j.error||'The sheet reported a problem.'));
+  return j;
+}
+function applyRead(j){
+  data={at:timeNow(),today:j.today,settings:j.settings,keys:j.keys,rows:j.rows,stats:j.stats,batch:j.batch||[],ladder:j.ladder||[],playbook:j.playbook||[]};
+  save(LS_DATA,data);
+  buildData();
+}
+async function syncAll(){
+  if(!cfg)return;
+  if(busy){again=true;return;}
+  busy=true;lastErr='';refreshSyncLabel();
+  try{
+    while(queue.length){
+      await call(queue[0]);
+      queue.shift();save(LS_Q,queue);
+    }
+    if(dirty){
+      dirty=false;save(LS_DIRTY,false);
+      try{await call({action:'saveTracker',state:{counts:state.counts,status:state.status}});}
+      catch(e){dirty=true;save(LS_DIRTY,true);throw e;}
+    }
+    const j=await call({action:'read'});
+    if(!j.tracker||!j.tracker.updated){
+      await call({action:'saveTracker',state:{counts:state.counts,status:state.status}});
+    }else if(!dirty){
+      state={counts:j.tracker.counts||{},status:j.tracker.status||{}};
+      save(LS_STATE,state);
+    }
+    applyRead(j);
+  }catch(e){
+    lastErr=(e&&e.message)||'Could not reach the sheet.';
+    if(e instanceof TypeError)lastErr='No connection to the sheet right now. Your changes are kept and will sync when you are back online.';
+  }
+  busy=false;refreshSyncLabel();softRender();
+  if(again||queue.length||dirty){again=false;if(!lastErr)syncAll();}
+}
+function schedule(ms){clearTimeout(timer);if(cfg)timer=setTimeout(syncAll,ms);}
+function touch(){
+  save(LS_STATE,state);
+  dirty=true;save(LS_DIRTY,true);
+  refreshSyncLabel();schedule(800);
+}
+function enqueue(op){
+  op.opId=Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  queue.push(op);save(LS_Q,queue);
+  refreshSyncLabel();schedule(300);
+}
+
+/* ---------- render ---------- */
 function itemHtml(it){
   const n=cnt(it.id),hit=n>=it.target,pct=Math.min(100,Math.round(n/it.target*100));
-  return '<div class="row'+(hit?' hit':'')+'"><div><div class="lbl">'+it.label+'</div>'+(it.hint?'<div class="hint">'+it.hint+'</div>':'')+'</div>'+
-    '<div class="ctl"><button class="btn" data-act="dec" data-id="'+it.id+'" aria-label="Subtract one from '+it.label+'">−</button>'+
+  return '<div class="row'+(hit?' hit':'')+'"><div><div class="lbl">'+esc(it.label)+'</div>'+(it.hint?'<div class="hint">'+esc(it.hint)+'</div>':'')+'</div>'+
+    '<div class="ctl"><button class="btn" data-act="dec" data-id="'+it.id+'" aria-label="Subtract one from '+esc(it.label)+'">−</button>'+
     '<div class="num"><b>'+n+'</b><span> / '+it.target+'</span></div>'+
-    '<button class="btn plus" data-act="inc" data-id="'+it.id+'" aria-label="Add one to '+it.label+'">+</button></div>'+
+    '<button class="btn plus" data-act="inc" data-id="'+it.id+'" aria-label="Add one to '+esc(it.label)+'">+</button></div>'+
     '<div class="bar"><i style="width:'+pct+'%"></i></div></div>';
+}
+function groupsHtml(gs,t){
+  return gs.map((g,i)=>'<section class="grp"><header><h2>'+esc(g.title)+'</h2>'+(g.reset?'<button class="reset'+(armed===t+i?' arm':'')+'" data-act="reset" data-g="'+i+'" type="button">'+(armed===t+i?'Tap again to reset':esc(g.reset))+'</button>':'')+'</header>'+g.items.map(itemHtml).join('')+'</section>').join('');
+}
+function catChip(c){return c==='Customer'||c==='Partner'?c:'Not tagged';}
+function itemRow(c){
+  const open=ui.open===c.id;
+  const sub=[catChip(c.cat),c.status||'Not contacted',c.last?('last '+c.last):'',c.fu&&c.fu<=today()?('follow-up '+c.fu):''].filter(Boolean).join(' · ');
+  const quick=(!c.tag&&c.cat==='Unverified')?'<div class="qt"><button type="button" data-act="tag" data-id="'+esc(c.id)+'" data-tag="C" aria-label="Tag '+esc(c.name)+' as customer">C</button><button type="button" data-act="tag" data-id="'+esc(c.id)+'" data-tag="P" aria-label="Tag '+esc(c.name)+' as partner">P</button></div>':'';
+  return '<div class="item" data-item="'+esc(c.id)+'"><div class="ihead"><button class="irow" type="button" data-act="open" data-id="'+esc(c.id)+'" aria-expanded="'+open+'"><span class="iname">'+esc(c.name)+'</span><span class="isub">'+esc(sub)+'</span></button>'+(open?'':quick)+'</div>'+(open?panelHtml(c):'')+'</div>';
+}
+function ladderFor(c){
+  const L=(data&&data.ladder)||[];
+  if(L.length<2)return '';
+  const col=c.cat==='Partner'?2:1;
+  const rows=L.slice(1).map((r)=>'<div class="ref"><h3>'+esc((r[0]||'').replace(/\n/g,' '))+'</h3><p>'+esc(r[col]||'')+'</p></div>').join('');
+  const who=c.cat==='Partner'?'partner':c.cat==='Customer'?'customer':'customer (tag this person to switch)';
+  return '<details><summary>What to say next (for a '+who+')</summary><div class="body">'+rows+'</div></details>';
+}
+function panelHtml(c){
+  const f=ui.form;
+  const b=batchInfo.get(c.id);
+  const bits=[c.org,c.loc,c.job].filter(Boolean).map(esc).join(' · ');
+  const digits=c.phone.replace(/[^\d+]/g,'');
+  let h='<div class="panel">';
+  if(c.flag)h+='<div class="chip warn">'+esc(c.flag)+'</div>';
+  if(bits)h+='<div class="hint">'+bits+'</div>';
+  h+='<div class="links">'+(digits?'<a href="sms:'+esc(digits)+'">Text '+esc(c.phone)+'</a><a href="tel:'+esc(digits)+'">Call</a>':'<span class="hint">No phone number on file</span>')+(c.email?'<a href="mailto:'+esc(c.email)+'">Email</a>':'')+'</div>';
+  if(b&&b.draft){
+    const parts=b.draft.split(/\n/).map((l)=>l.replace(/^Bubble\s*\d+:\s*/i,'').trim()).filter(Boolean);
+    h+='<div class="f"><label>Message 1 draft'+(b.sent?' (sheet says sent: '+esc(b.sent)+')':'')+'</label>'+parts.map((p,i)=>'<div class="bubble"><div class="msg">'+esc(p)+'</div><button class="ghost" type="button" data-act="copy" data-i="'+i+'">Copy</button></div>').join('')+'</div>';
+    if(b.found)h+='<details><summary>What I found about them</summary><div class="body">'+esc(b.found)+'</div></details>';
+  }
+  h+=ladderFor(c);
+  h+='<div class="f"><label>Customer or partner</label><div class="tagrow">'+
+    [['C','Customer'],['P','Partner'],['','Clear']].map((t)=>'<button type="button" class="ghost" data-act="tag" data-id="'+esc(c.id)+'" data-tag="'+t[0]+'" aria-pressed="'+(t[0]===c.tag&&t[0]!==''?'true':'false')+'">'+t[1]+'</button>').join('')+'</div></div>';
+  h+='<div class="f"><label for="f-platform">Where</label><select id="f-platform" data-f="platform">'+PLATFORMS.map((p)=>'<option'+(p===f.platform?' selected':'')+'>'+p+'</option>').join('')+'</select></div>'+
+    '<div class="f"><label for="f-step">Step</label><select id="f-step" data-f="step">'+STEPS.map((p)=>'<option'+(p===f.step?' selected':'')+'>'+p+'</option>').join('')+'</select></div>';
+  h+='<div class="checks"><label><input type="checkbox" data-f="sent"'+(f.sent?' checked':'')+'> I sent a message</label><label><input type="checkbox" data-f="replied"'+(f.replied?' checked':'')+'> They replied</label></div>';
+  h+='<div class="f"><label for="f-outcome">Outcome</label><select id="f-outcome" data-f="outcome">'+OUTCOMES.map((p)=>'<option value="'+p+'"'+(p===f.outcome?' selected':'')+'>'+(p||'None yet')+'</option>').join('')+'</select></div>';
+  h+='<div class="f"><label for="f-learned">What I learned</label><textarea id="f-learned" data-f="learned" maxlength="500" placeholder="One personal detail, for the next message">'+esc(f.learned)+'</textarea></div>';
+  h+='<button class="primary" type="button" data-act="log" data-id="'+esc(c.id)+'">Log it</button></div>';
+  return h;
+}
+function outreachHtml(){
+  if(!cfg||!data){
+    return '<div class="grp"><header><h2>Your outreach list</h2></header><p class="note">Connect your Google Sheet to see your contacts, the Day 1 batch and your follow-ups here.</p><button class="primary" type="button" data-act="goto" data-id="sync" style="margin-bottom:14px">Connect the sheet</button></div>';
+  }
+  const s=settings(),st=data.stats||{customers:0,partners:0},p=pendingSent();
+  const t=today();
+  const due=contacts.filter((c)=>visible(c)&&c.fu&&c.fu<=t).length;
+  let h='<div class="tiles"><div class="tile"><div class="n">'+(st.customers+p.Customer)+'<small> / '+s.custTarget+'</small></div><div class="t">Customers today</div></div>'+
+    '<div class="tile"><div class="n">'+(st.partners+p.Partner)+'<small> / '+s.partTarget+'</small></div><div class="t">Partners today</div></div>'+
+    '<div class="tile"><div class="n">'+due+'</div><div class="t">Follow-ups due</div></div></div>';
+  h+='<div class="chips" role="group" aria-label="Filter contacts">'+FILTERS.map((f)=>'<button type="button" class="fchip" data-act="filter" data-id="'+f[0]+'" aria-pressed="'+(ui.filter===f[0]&&!ui.q)+'">'+f[1]+'</button>').join('')+'</div>';
+  h+='<div class="search"><input id="q" type="search" placeholder="Search name, phone, place" value="'+esc(ui.q)+'" aria-label="Search contacts" autocomplete="off"></div>';
+  h+='<section class="grp" style="padding-top:4px"><div id="olist">'+listHtml()+'</div></section>';
+  return h;
+}
+function listHtml(){
+  const rows=list();
+  if(!rows.length){
+    const msg=ui.q?'No one matches that search.':ui.filter==='due'?'Nobody is due for a follow-up. Nice.':ui.filter==='batch'?'No Day 1 batch rows found in your sheet.':'Nobody here yet.';
+    return '<div class="empty">'+msg+'</div>';
+  }
+  const shown=rows.slice(0,ui.limit);
+  return shown.map(itemRow).join('')+(rows.length>shown.length?'<button class="ghost more" type="button" data-act="more">Show more ('+(rows.length-shown.length)+' left)</button>':'');
+}
+function playbookHtml(){
+  if(!data||(!(data.ladder||[]).length&&!(data.playbook||[]).length)){
+    return '<div class="grp"><header><h2>Playbook</h2></header><p class="note">Connect your sheet in the Sync tab to bring your Reply Ladder and Reply Playbook here.</p></div>';
+  }
+  let h='';
+  const L=data.ladder||[];
+  if(L.length>1){
+    h+='<section class="grp"><header><h2>Reply ladder</h2></header><p class="note">From your sheet. Customer and partner versions of each message.</p>'+
+      L.slice(1).map((r)=>'<div class="ref"><h3>'+esc((r[0]||'').replace(/\n/g,' '))+'</h3>'+
+        (r[1]?'<div class="who">Customer</div><p>'+esc(r[1])+'</p>':'')+(r[2]&&r[2]!==r[1]?'<div class="who">Partner</div><p>'+esc(r[2])+'</p>':'')+
+        (r[3]?'<div class="who">Why it works</div><p>'+esc(r[3])+'</p>':'')+'</div>').join('')+'</section>';
+  }
+  const P=data.playbook||[];
+  if(P.length>1){
+    h+='<section class="grp"><header><h2>Reply playbook</h2></header>'+
+      P.slice(1).map((r)=>'<div class="ref"><h3>'+esc(r[0]||'')+'</h3>'+(r[1]?'<div class="hint">'+esc(r[1])+'</div>':'')+
+        (r[2]?'<div class="who">Customer</div><p>'+esc(r[2])+'</p>':'')+(r[3]&&r[3]!==r[2]?'<div class="who">Partner</div><p>'+esc(r[3])+'</p>':'')+'</div>').join('')+'</section>';
+  }
+  return h;
+}
+function syncHtml(){
+  let h='';
+  if(lastErr)h+='<p class="err" role="alert">'+esc(lastErr)+'</p>';
+  h+='<section class="grp"><header><h2>Google Sheet</h2><span class="chip'+(cfg?' on':'')+'">'+(cfg?'Connected':'Not connected')+'</span></header>'+
+    '<p class="note">Your counts, contacts and outreach log stay in step with your LSC_INTL_Outreach_Tracker sheet. Contacts are stored only on this phone and in your sheet, never on this web page.</p>'+
+    '<div class="panel"><div class="f"><label for="cfg-url">Web app URL</label><input id="cfg-url" type="url" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec" value="'+esc(cfg?cfg.url:'')+'" autocomplete="off"></div>'+
+    '<div class="f"><label for="cfg-token">Secret code</label><input id="cfg-token" type="password" value="'+esc(cfg?cfg.token:'')+'" autocomplete="off"></div>'+
+    '<button class="primary" type="button" data-act="connect">Save and sync</button>'+
+    (cfg?'<button class="ghost" type="button" data-act="syncnow">Sync now</button>':'')+
+    (cfg?'<button class="ghost" type="button" data-act="disconnect">Disconnect and clear sheet data from this phone</button>':'')+
+    '<p class="hint">'+(queue.length+(dirty?1:0))+' change(s) waiting to sync. '+(data&&data.at?'Last sync '+esc(data.at)+'.':'')+'</p></div></section>';
+  return h;
+}
+function takeLine(){
+  let hit=0,total=0;
+  PACE.forEach((g)=>g.items.forEach((it)=>{total++;if(cnt(it.id)>=it.target)hit++;}));
+  $take.innerHTML='<b>'+hit+'</b> of <b>'+total+'</b> daily, weekly and monthly targets hit';
 }
 function render(){
   $tabs.innerHTML=TABS.map((t)=>'<button class="tab" role="tab" data-act="tab" data-id="'+t.id+'" aria-selected="'+(t.id===tab)+'">'+t.name+'</button>').join('');
   const t=TABS.find((x)=>x.id===tab);
   let html='';
-  groups=[];
   if(t.id==='road'){
     html='<div class="grp"><header><h2>Road to Platinum</h2></header><p class="note">Tap a step to change its status.</p>'+
-      ROAD.map((r)=>{const s=Number(state.status[r.id])||0;return '<button class="stat" data-act="status" data-id="'+r.id+'"><span><span class="lbl">'+r.name+'</span><br><span class="hint">'+r.when+'</span></span><span class="chip s'+s+'">'+STATUS[s]+'</span></button>';}).join('')+'</div>';
-  }else{
-    if(t.rank)html+='<p class="note">Target date: '+t.rank.when+'</p>';
-    allGroups(t).forEach((g,i)=>{
-      groups.push(g);
-      html+='<section class="grp"><header><h2>'+g.title+'</h2>'+(g.reset?'<button class="reset'+(armed===t.id+i?' arm':'')+'" data-act="reset" data-g="'+i+'">'+(armed===t.id+i?'Tap again to reset':g.reset)+'</button>':'')+'</header>'+g.items.map(itemHtml).join('')+'</section>';
-    });
-  }
+      ROAD.map((r)=>{const s=Number(state.status[r.id])||0;return '<button class="stat" data-act="status" data-id="'+r.id+'"><span><span class="lbl">'+esc(r.name)+'</span><br><span class="hint">'+esc(r.when)+'</span></span><span class="chip s'+s+'">'+STATUS[s]+'</span></button>';}).join('')+'</div>';
+  }else if(t.id==='outreach')html=outreachHtml();
+  else if(t.id==='playbook')html=playbookHtml();
+  else if(t.id==='sync')html=syncHtml();
+  else if(t.id==='pace')html=groupsHtml(PACE,'pace');
+  else html='<p class="note">Target date: '+esc(t.rank.when)+'</p>'+groupsHtml(rankGroups(t.rank),t.id);
   $app.innerHTML=html;
-  let hit=0,total=0;
-  PACE.forEach((g)=>g.items.forEach((it)=>{total++;if(cnt(it.id)>=it.target)hit++;}));
-  $take.innerHTML='<b>'+hit+'</b> of <b>'+total+'</b> daily, weekly and monthly targets hit';
+  takeLine();refreshSyncLabel();
 }
-function setSync(s){$sync.textContent=s;}
-function touch(){
-  rev++;dirty=true;setSync(ref?'Saving…':'Saved on this device');
-  try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}
-  clearTimeout(timer);timer=setTimeout(save,500);
+function softRender(){
+  const a=document.activeElement;
+  if(a&&$app.contains(a)&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)){renderLater=true;return;}
+  renderLater=false;render();
 }
-async function save(){
-  if(!ref){dirty=false;return;}
-  if(saving){again=true;return;}
-  saving=true;
-  do{
-    again=false;const r=rev;
-    try{await ref.set({counts:state.counts,status:state.status});if(r===rev){dirty=false;setSync('Saved');}}
-    catch(e){setSync('Saved on this device only');}
-  }while(again);
-  saving=false;
+function toast(m){
+  $toast.textContent=m;$toast.hidden=false;
+  clearTimeout(toast.t);toast.t=setTimeout(()=>{$toast.hidden=true;},2600);
+}
+
+/* ---------- actions ---------- */
+function openContact(id){
+  if(ui.open===id){ui.open=null;render();return;}
+  const c=byId.get(id),b=batchInfo.get(id);
+  ui.open=id;
+  ui.form={platform:b&&/imessage|text|sms/i.test(b.channel)?'Text':'Text',step:STEPS[0],sent:true,replied:false,outcome:'',learned:''};
+  if(c&&c.status&&c.status!=='Not contacted'&&c.status!=='Messaged')ui.form.step='Follow-up';
+  render();
+}
+function setTag(id,t){
+  const c=byId.get(id);if(!c)return;
+  c.tag=t;
+  c.cat=t==='C'?'Customer':t==='P'?'Partner':(c.age?c.cat:'Unverified');
+  save(LS_DATA,data);
+  enqueue({action:'tag',id:id,tag:t});
+  toast(t?('Tagged '+(t==='C'?'customer':'partner')):'Tag cleared');
+  render();
+}
+function logIt(id){
+  const f=ui.form,c=byId.get(id);if(!c)return;
+  if(!f.sent&&!f.replied&&!f.outcome&&!(f.learned||'').trim()){toast('Tick sent or replied, or add a note first');return;}
+  let status='';
+  if(f.outcome)status=f.outcome;
+  else if(f.replied)status='Replied';
+  else if(f.sent&&(!c.status||c.status==='Not contacted'||c.status==='Messaged'))status='Messaged';
+  const op={action:'act',id:id,platform:f.platform,step:f.step,sent:!!f.sent,replied:!!f.replied,outcome:f.outcome,learned:(f.learned||'').trim(),status:status};
+  if(f.sent||f.replied)c.last=today();
+  if(status)c.status=status;
+  c.fu=(f.sent&&!f.replied&&!f.outcome)?addDays(today(),settings().gap):(status==='Messaged'||status==='Replied')?c.fu:'';
+  save(LS_DATA,data);
+  enqueue(op);
+  ui.open=null;
+  toast(cfg?'Logged. Syncing to your sheet…':'Logged on this phone');
+  render();
+}
+async function copyText(t,btn){
+  try{await navigator.clipboard.writeText(t);}
+  catch(e){
+    const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');}catch(e2){}
+    ta.remove();
+  }
+  const old=btn.textContent;btn.textContent='Copied';setTimeout(()=>{btn.textContent=old;},1400);
 }
 $tabs.addEventListener('click',(e)=>{const b=e.target.closest('[data-act=tab]');if(!b)return;tab=b.dataset.id;armed=null;render();});
+$sync.addEventListener('click',()=>{tab='sync';render();});
 $app.addEventListener('click',(e)=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   const a=b.dataset.act,id=b.dataset.id;
   if(a==='inc'||a==='dec'){state.counts[id]=Math.max(0,cnt(id)+(a==='inc'?1:-1));touch();render();}
   else if(a==='status'){state.status[id]=((Number(state.status[id])||0)+1)%STATUS.length;touch();render();}
   else if(a==='reset'){
+    const gs=tab==='pace'?PACE:rankGroups(TABS.find((x)=>x.id===tab).rank);
     const key=tab+b.dataset.g;
     if(armed!==key){armed=key;clearTimeout(armTimer);armTimer=setTimeout(()=>{armed=null;render();},3000);render();return;}
     clearTimeout(armTimer);armed=null;
-    groups[Number(b.dataset.g)].items.forEach((it)=>{state.counts[it.id]=0;});
+    gs[Number(b.dataset.g)].items.forEach((it)=>{state.counts[it.id]=0;});
     touch();render();
   }
+  else if(a==='filter'){ui.filter=id;ui.q='';ui.open=null;ui.limit=40;render();}
+  else if(a==='more'){ui.limit+=40;document.getElementById('olist').innerHTML=listHtml();}
+  else if(a==='open'){openContact(id);}
+  else if(a==='tag'){setTag(id,b.dataset.tag);}
+  else if(a==='log'){logIt(id);}
+  else if(a==='copy'){
+    const bi=batchInfo.get(ui.open);
+    if(bi){const parts=bi.draft.split(/\n/).map((l)=>l.replace(/^Bubble\s*\d+:\s*/i,'').trim()).filter(Boolean);copyText(parts[Number(b.dataset.i)]||'',b);}
+  }
+  else if(a==='goto'){tab=id;render();}
+  else if(a==='connect'){
+    const url=document.getElementById('cfg-url').value.trim(),token=document.getElementById('cfg-token').value.trim();
+    if(!/^https:\/\/script\.google\.com\/.+/.test(url)){lastErr='Paste the Web app URL from Apps Script. It starts with https://script.google.com/';render();return;}
+    if(!token){lastErr='Enter the secret code from the top of the script.';render();return;}
+    cfg={url:url,token:token};save(LS_CFG,cfg);lastErr='';
+    syncAll().then(()=>{if(!lastErr){tab='outreach';toast('Connected. Your sheet is synced.');}render();});
+  }
+  else if(a==='syncnow'){syncAll();}
+  else if(a==='disconnect'){
+    cfg=null;data=null;queue=[];dirty=false;lastErr='';
+    try{[LS_CFG,LS_DATA,LS_Q,LS_DIRTY].forEach((k)=>localStorage.removeItem(k));}catch(e){}
+    buildData();render();toast('Disconnected. Sheet data removed from this phone.');
+  }
 });
+$app.addEventListener('input',(e)=>{
+  const t=e.target;
+  if(t.id==='q'){ui.q=t.value;ui.limit=40;ui.open=null;document.getElementById('olist').innerHTML=listHtml();}
+  else if(t.dataset&&t.dataset.f){ui.form[t.dataset.f]=t.type==='checkbox'?t.checked:t.value;}
+});
+$app.addEventListener('change',(e)=>{const t=e.target;if(t.dataset&&t.dataset.f)ui.form[t.dataset.f]=t.type==='checkbox'?t.checked:t.value;});
+$app.addEventListener('focusout',()=>{setTimeout(()=>{if(renderLater)softRender();},0);});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncAll();});
+window.addEventListener('online',()=>syncAll());
+
+/* ---------- start ---------- */
 render();
-setSync('Saved on this device');
+if(cfg)syncAll();
 </script>
 </body></html>
