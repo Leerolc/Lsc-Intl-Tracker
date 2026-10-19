@@ -138,10 +138,10 @@ const PACE=[
     {id:'connections',label:'New connections',target:12},
     {id:'pcms',label:'PCMs',target:4,hint:'Feeds BRE clients'}]},
   {title:'This month',reset:'Reset month',items:[
-    {id:'pv300',label:'300pv circle',target:1,hint:'Due by the 15th of every month'},
+    {id:'pv300',label:'300pv circle',target:300,step:10,hint:'Due by the 15th of every month'},
     {id:'bre',label:'BRE clients',target:10}]},
-  {title:'Customer list',reset:null,items:[
-    {id:'customer_names',label:'Names added',target:25}]}
+  {title:'Customer orders',reset:null,items:[
+    {id:'customer_names',label:'Customer orders',target:25}]}
 ];
 function rankGroups(r){
   const k=r.key+'_';
@@ -292,12 +292,13 @@ function enqueue(op){
 }
 
 /* ---------- render ---------- */
+function stepOf(id){let s=1;PACE.forEach((g)=>g.items.forEach((it)=>{if(it.id===id&&it.step)s=it.step;}));return s;}
 function itemHtml(it){
   const n=cnt(it.id),hit=n>=it.target,pct=Math.min(100,Math.round(n/it.target*100));
   return '<div class="row'+(hit?' hit':'')+'"><div><div class="lbl">'+esc(it.label)+'</div>'+(it.hint?'<div class="hint">'+esc(it.hint)+'</div>':'')+'</div>'+
-    '<div class="ctl"><button class="btn" data-act="dec" data-id="'+it.id+'" aria-label="Subtract one from '+esc(it.label)+'">−</button>'+
+    '<div class="ctl"><button class="btn" data-act="dec" data-id="'+it.id+'" aria-label="Subtract '+(it.step||1)+' from '+esc(it.label)+'">−</button>'+
     '<div class="num"><b>'+n+'</b><span> / '+it.target+'</span></div>'+
-    '<button class="btn plus" data-act="inc" data-id="'+it.id+'" aria-label="Add one to '+esc(it.label)+'">+</button></div>'+
+    '<button class="btn plus" data-act="inc" data-id="'+it.id+'" aria-label="Add '+(it.step||1)+' to '+esc(it.label)+'">+</button></div>'+
     '<div class="bar"><i style="width:'+pct+'%"></i></div></div>';
 }
 function groupsHtml(gs,t){
@@ -479,7 +480,7 @@ $sync.addEventListener('click',()=>{tab='sync';render();});
 $app.addEventListener('click',(e)=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   const a=b.dataset.act,id=b.dataset.id;
-  if(a==='inc'||a==='dec'){state.counts[id]=Math.max(0,cnt(id)+(a==='inc'?1:-1));touch();render();}
+  if(a==='inc'||a==='dec'){const st=stepOf(id);state.counts[id]=Math.max(0,cnt(id)+(a==='inc'?st:-st));touch();render();}
   else if(a==='status'){state.status[id]=((Number(state.status[id])||0)+1)%STATUS.length;touch();render();}
   else if(a==='reset'){
     const gs=tab==='pace'?PACE:rankGroups(TABS.find((x)=>x.id===tab).rank);
