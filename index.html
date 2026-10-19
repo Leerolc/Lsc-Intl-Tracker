@@ -138,7 +138,7 @@ const PACE=[
     {id:'connections',label:'New connections',target:12},
     {id:'pcms',label:'PCMs',target:4,hint:'Feeds clients'}]},
   {title:'This month',reset:'Reset month',items:[
-    {id:'pv300',label:'300pv circle',target:300,step:10,hint:'Due by the 15th of every month'},
+    {id:'pv300',label:'300pv circle',target:300,hint:'Due by the 15th of every month'},
     {id:'bre',label:'Clients',target:10},
     {id:'memberships',label:'Memberships',target:10}]},
   {title:'Customer orders',reset:null,items:[
@@ -147,7 +147,7 @@ const PACE=[
 function rankGroups(r){
   const k=r.key+'_';
   return [
-    {title:'Monthly',reset:'Reset month',items:[{id:k+'pv300',label:'300pv circle',target:300,step:10,hint:'By the 15th of every month'}]},
+    {title:'Monthly',reset:'Reset month',items:[{id:k+'pv300',label:'300pv circle',target:300,hint:'By the 15th of every month'}]},
     {title:'Weekly',reset:'Reset week',items:[{id:k+'step3',label:'Step 3',target:5},{id:k+'connections',label:'New connections',target:12}]},
     {title:'Each Bridge text meeting',reset:'New meeting',items:[{id:k+'names',label:'New names',target:7}]}
   ];
@@ -293,7 +293,7 @@ function enqueue(op){
 }
 
 /* ---------- render ---------- */
-function stepOf(id){return /pv300$/.test(id)?10:1;}
+function stepOf(id){return 1;}
 function itemHtml(it){
   const n=cnt(it.id),hit=n>=it.target,pct=Math.min(100,Math.round(n/it.target*100));
   return '<div class="row'+(hit?' hit':'')+'"><div><div class="lbl">'+esc(it.label)+'</div>'+(it.hint?'<div class="hint">'+esc(it.hint)+'</div>':'')+'</div>'+
