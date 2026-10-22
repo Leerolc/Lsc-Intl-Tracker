@@ -170,7 +170,7 @@ const PACE=[
     {id:'bridge_names',label:'Names for Bridge text meeting',target:7,hint:'Meeting with Evans'}]},
   {title:'This week',reset:'Reset week',items:[
     {id:'step3',label:'Step 3',target:5},
-    {id:'connections',label:'New connections (for partnership)',target:12},
+    {id:'connections',label:'Partnership connections',target:12},
     {id:'pcms',label:'PCMs',target:4,hint:'Feeds customer orders'}]},
   {title:'This month',reset:'Reset month',items:[
     {id:'pv300',label:'300pv circle',target:300,hint:'Due by the 15th of every month'},
@@ -181,7 +181,7 @@ function rankGroups(r){
   const k=r.key+'_';
   return [
     {title:'Monthly',reset:'Reset month',items:[{id:k+'pv300',label:'300pv circle',target:300,hint:'By the 15th of every month'}]},
-    {title:'Weekly',reset:'Reset week',items:[{id:k+'step3',label:'Step 3',target:5},{id:k+'connections',label:'New connections (for partnership)',target:12}]},
+    {title:'Weekly',reset:'Reset week',items:[{id:k+'step3',label:'Step 3',target:5},{id:k+'connections',label:'Partnership connections',target:12}]},
     {title:'Each Bridge text meeting',reset:'New meeting',items:[{id:k+'names',label:'New names',target:7}]}
   ];
 }
