@@ -166,7 +166,7 @@ const ROAD=RANKS.map((r)=>({id:r.key,name:r.name,when:r.when})).concat([{id:'fed
 const STATUS=['Not started','In progress','Achieved'];
 const PACE=[
   {title:'Today',reset:'Reset today',items:[
-    {id:'conversations',label:'Conversations',target:3},
+    {id:'conversations',label:'Conversations',target:3,hint:'Auto-counts partner messages logged as sent'},
     {id:'bridge_names',label:'Names for Bridge text meeting',target:7,hint:'Meeting with Evans'}]},
   {title:'This week',reset:'Reset week',items:[
     {id:'step3',label:'Step 3',target:5},
@@ -310,8 +310,15 @@ async function syncAll(){
     lastErr=(e&&e.message)||'Could not reach the sheet.';
     if(e instanceof TypeError)lastErr='No connection to the sheet right now. Your changes are kept and will sync when you are back online.';
   }
-  busy=false;dailyRollover();refreshSyncLabel();softRender();
+  busy=false;dailyRollover();autoCounts();refreshSyncLabel();softRender();
   if(again||queue.length||dirty){again=false;if(!lastErr)syncAll();}
+}
+/* Conversations follows the Daily Log: every message to a potential business partner (Category Partner) logged as sent today.
+   The sheet number is a floor. Tapping + still adds on top, and a lower number is lifted back on the next sync. */
+function autoCounts(){
+  if(!cfg||!data||!data.stats||data.today!==today())return;
+  const n=Math.max(0,Math.round(Number(data.stats.partners)||0));
+  if(n>cnt('conversations'))setCount('conversations',n);
 }
 function schedule(ms){clearTimeout(timer);if(cfg)timer=setTimeout(syncAll,ms);}
 function touch(){
